@@ -5,9 +5,9 @@ import javax.swing.*;
 public class BinarizationTest {
     public Image binarizedImage;
 
-    public void test() {
+    public void test(String imgName) {
         // String imagepath = "save-an.jpg";
-        String imagepath = "c.png";
+        String imagepath = imgName;
         String savepath = "save-n.png";
         // String imagepath = args[0];
         JFrame window = new JFrame();

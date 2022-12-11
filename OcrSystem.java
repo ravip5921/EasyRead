@@ -6,18 +6,18 @@ public class OcrSystem {
         // ********************************BINARIZATION********************************
 
         BinarizationTest bint1 = new BinarizationTest();
-        bint1.test();
+        bint1.test("a.png");
 
         // ********************************SEGMENTATION********************************
 
         Segmentation seg = new Segmentation(bint1.binarizedImage.pixel);
         // Segmentation seg = new Segmentation();
-        seg.printImg();
-        seg.labelComponents1();
+        // seg.printImg();
+        int index = seg.labelComponents();
         // System.out.println("hi");
-        seg.printImg();
+        // seg.printImg();
         seg.prepareComponentList();
-        seg.mergeSiblings();
+        seg.mergeSiblings(index);
         seg.getRectangles();
 
         // *******************************SKEW-CORRECTION*******************************

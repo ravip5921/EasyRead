@@ -19,16 +19,15 @@ import java.util.ArrayList;
 public class Segmentation {
 
     private int MAX_COMP = 50000;
-    private int MAX_TWINS = 10000;
     private int IMG_X = 10;
     private int IMG_Y = 10;
 
-    private int twinsIndex = 0;
     private int[][] image;
-    private int[][] twins;
     private Component listedComp[];
 
     private int componentSequence[];
+    private int componentRoot[];
+    private int componentTrailer[];
     private ArrayList<ArrayList<Integer>> componentSiblings = new ArrayList<ArrayList<Integer>>();
 
     private BufferedImage bimg;
@@ -41,7 +40,6 @@ public class Segmentation {
         // initialise instance variables
 
         image = new int[IMG_X][IMG_Y];
-        twins = new int[MAX_TWINS][2];
         listedComp = new Component[MAX_COMP];
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
@@ -80,14 +78,14 @@ public class Segmentation {
 
     public Segmentation(int[][] binImage) {
         image = binImage;
-        twins = new int[MAX_TWINS][2];
         listedComp = new Component[MAX_COMP];
         IMG_X = binImage.length;
         IMG_Y = binImage[0].length;
-        System.out.println(IMG_X + "hi" + IMG_Y);
+
         MAX_COMP = IMG_X * IMG_Y;
-        MAX_TWINS = (int) (MAX_COMP / 2);
         componentSequence = new int[MAX_COMP];
+        componentRoot = new int[MAX_COMP];
+        componentTrailer = new int[MAX_COMP];
     }
 
     public void printImg() {
@@ -99,7 +97,16 @@ public class Segmentation {
         }
     }
 
-    public void labelComponents1() {
+    public int getRoot(int x) {
+        int temp = x;
+        while (componentSequence[temp] != temp) {
+            // System.out.println(temp + "ds" + componentSequence[temp]);
+            temp = componentSequence[temp];
+        }
+        return temp;
+    }
+
+    public int labelComponents() {
         int componentIndex = 2;
         // boolean neighbourFound;
         for (int j = 0; j < IMG_Y; j++) {
@@ -114,23 +121,25 @@ public class Segmentation {
 
                         // Checking left neighbour for SIBLINGS
                         if (((i > 0 && image[i - 1][j] != 0)) && image[i][j] != image[i - 1][j]) {
-                            // componentSequence[image[i - 1][j]] = image[i][j];
-                            int temp = componentSequence[image[i - 1][j]];
-                            int temp2 = image[i - 1][j];
-                            boolean setSibling = true;
-                            while (componentSequence[temp] != temp) {
-                                temp = componentSequence[temp];
-                                if (temp == temp2) {
-                                    setSibling = false;
-                                    break;
-                                }
+                            int rootX = getRoot(image[i][j]);
+                            int rootY = getRoot(image[i - 1][j]);
+                            if (rootX == rootY) {
+                                continue;
                             }
-                            if (setSibling) {
-                                componentSequence[temp] = image[i][j];
-                            }
+                            componentSequence[rootY] = componentTrailer[rootX];
 
+                            componentTrailer[rootX] = componentTrailer[rootY];
+
+                            int temp1 = componentTrailer[rootY];
+
+                            while (temp1 != componentSequence[rootY]) {
+                                // System.out.println("Root changed.");
+                                componentRoot[temp1] = rootX;
+
+                                temp1 = componentSequence[temp1];
+
+                            }
                         }
-
                     }
                     // Checking left neighbour
                     else if (((i > 0 && image[i - 1][j] != 0))) {
@@ -143,109 +152,33 @@ public class Segmentation {
                         image[i][j] = componentIndex;
                         componentIndex++;
                         componentSequence[image[i][j]] = image[i][j];
+
+                        componentRoot[image[i][j]] = image[i][j];
+                        componentTrailer[image[i][j]] = image[i][j];
                     }
                 }
             }
         }
-
         for (int i = 2; i < componentIndex; i++) {
-
-            defineSiblings(i, componentSequence[i]);
-
             System.out.println(componentSequence[i]);
         }
-        // Displaying the siblings list
-        for (ArrayList<Integer> siblings : componentSiblings) {
-            System.out.println(siblings.toString());
+        System.out.println("Roots:");
+        for (int i = 2; i < componentIndex; i++) {
+            System.out.println(componentRoot[i]);
         }
-
+        System.out.println("Trailer Array");
+        for (int i = 2; i < componentIndex; i++) {
+            System.out.println(componentTrailer[i]);
+        }
+        return componentIndex;
     }
 
-    // Adding components to siblings list
-    public void defineSiblings(int componentIndex, int siblingValue) {
-
-        for (ArrayList<Integer> siblings : componentSiblings) {
-            for (Integer componentVal : siblings) {
-                if (componentVal == siblingValue) {
-                    siblings.add(componentIndex);
-                    return;
-                }
+    public void mergeSiblings(int componentIndex) {
+        for (int i = 2; i < componentIndex; i++) {
+            listedComp[componentRoot[i]].mergeComp(listedComp[i]);
+            if (componentRoot[i] != i) {
+                listedComp[i] = null;
             }
-        }
-        ArrayList<Integer> temp = new ArrayList<Integer>();
-        temp.add(componentIndex);
-        componentSiblings.add(temp);
-    }
-
-    public void mergeSiblings() {
-        for (ArrayList<Integer> siblings : componentSiblings) {
-
-            int parent = siblings.get(0);
-            // System.out.println("hi" + parent);
-
-            for (int i = 1; i < siblings.size(); i++) {
-                // System.out.println("hi" + i);
-                listedComp[parent].mergeComp(listedComp[siblings.get(i)]);
-                listedComp[siblings.get(i)] = null;
-            }
-
-        }
-    }
-
-    public void labelComponents() {
-        int componentIndex = 1;
-
-        // Twins indicate different components with different index that are a single
-        // component
-        // int twins[][] = new int[10][2];
-        // int twinsIndex = 0;
-        for (int i = 0; i < IMG_X; i++) {
-            for (int j = 0; j < IMG_Y; j++) {
-                if (image[i][j] == 1) {
-                    image[i][j] = componentIndex + 1;
-                    componentIndex++;
-                }
-
-                // Checking to see if upper neighbour is a part of previously labelled component
-                if (((i > 0 && image[i - 1][j] != 0)) && image[i][j] == componentIndex) {
-
-                    // Decrement index count to previous value as no new component detected.
-                    componentIndex--;
-
-                    // Make current pixel a part of neighbour component
-                    image[i][j] = image[i - 1][j];
-
-                    // Checking if precceding pixels are part of the component or not
-                    if (j > 0 && image[i][j - 1] != 0) {
-                        image[i][j - 1] = image[i][j];
-                        if ((j - 1 > 0 && image[i][j - 2] != 0) && (image[i][j - 1] != image[i][j - 2])) {
-                            twins[twinsIndex][0] = image[i][j];
-                            twins[twinsIndex][1] = image[i][j - 2];
-                            twinsIndex++;
-                        }
-                    }
-
-                    // System.out.println("Neighbour!!" + i + j);
-                    continue;
-                }
-                // Checking to see if left beighbour is a part of previously labelled component
-                if ((j > 0 && image[i][j - 1] != 0) && image[i][j] == componentIndex) {
-
-                    // Decrement index count to previous value as no new component detected.
-                    componentIndex--;
-
-                    // Make current pixel a part of neighbour component
-                    image[i][j] = image[i][j - 1];
-                    // System.out.println("Neighbour!!" + i + j);
-                    continue;
-                }
-
-            }
-        }
-
-        // print twins array
-        for (int i = 0; i < twinsIndex; i++) {
-            System.out.println(twins[i][0] + " " + twins[i][1]);
         }
     }
 
@@ -277,31 +210,18 @@ public class Segmentation {
                 }
             }
         }
-        // Twins i.e. co-ordinates of component parts of a single component having
-        // different labels are merged as one big rectangle
 
-        // colorComponents();
-        // mergeTwins();
-        // Bounding rectangle for each labelled component
-        // getRectangles();
-    }
-
-    public void mergeTwins() {
-        // Iterates in twins array and merges two rectangles into one (done by mergeComp
-        // method) and rearranges values in listedComp array
-        for (int i = 0; i < twinsIndex; i++) {
-            listedComp[twins[i][0]].mergeComp(listedComp[twins[i][1]]);
-            listedComp[twins[i][1]] = null;
-
-        }
     }
 
     public void getRectangles() {
+        int count = 0;
         for (int i = 0; i < listedComp.length - 1; i++) {
             if (listedComp[i] != null) {
                 listedComp[i].showValues(i);
+                count++;
             }
         }
+        System.out.println("components = " + count);
     }
 
     public void colorComponents() {
