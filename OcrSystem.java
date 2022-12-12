@@ -6,7 +6,7 @@ public class OcrSystem {
         // ********************************BINARIZATION********************************
 
         BinarizationTest bint1 = new BinarizationTest();
-        bint1.test("a.png");
+        bint1.test("a (3).png");
 
         // ********************************SEGMENTATION********************************
 

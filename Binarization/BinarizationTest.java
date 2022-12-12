@@ -17,7 +17,7 @@ public class BinarizationTest {
         OCR ocr = new OCR();
         OCR.Binarization bin = ocr.new Binarization();
         // float k = Float.parseFloat(args[0]);
-        float k = 0.20f;
+        float k = 0.035f;
         int w = 25;
         // int w = Integer.parseInt(args[1]);
         // OCR.Binarization.Otsu otsu = bin.new Otsu();
@@ -62,6 +62,6 @@ public class BinarizationTest {
 
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setSize(600, 600);
-        window.setVisible(true);
+        // window.setVisible(true);
     }
 }

@@ -12,6 +12,7 @@ public class Segmentation {
     private int IMG_Y = 10;
 
     private int[][] image;
+    private int[][] binarizedImage;
     private Component listedComp[];
 
     private int componentSequence[];
@@ -63,6 +64,7 @@ public class Segmentation {
 
     public Segmentation(int[][] binImage) {
         image = binImage;
+        binarizedImage = binImage;
         listedComp = new Component[MAX_COMP];
         IMG_X = binImage.length;
         IMG_Y = binImage[0].length;
@@ -212,10 +214,10 @@ public class Segmentation {
     public void colorComponents() {
         ImagePanel imgP = new ImagePanel();
         Image img = new Image(IMG_X, IMG_Y);
-        img.pixel = image;
+        img.pixel = binarizedImage;
         JFrame window = new JFrame();
         // printImg();
-        imgP.setBuffBounding(img, listedComp);
+        imgP.setBuffBoundingOnBinarized(img, listedComp);
 
         window.getContentPane().add(imgP);
 
