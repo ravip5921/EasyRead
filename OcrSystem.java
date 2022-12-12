@@ -1,5 +1,5 @@
 import Binarization.*;
-import Segmentation.*;
+import SEG.*;
 
 public class OcrSystem {
     public static void main(String[] args) {
@@ -18,8 +18,8 @@ public class OcrSystem {
         // seg.printImg();
         seg.prepareComponentList();
         seg.mergeSiblings(index);
-        seg.getRectangles();
-
+        // seg.getRectangles();
+        seg.colorComponents();
         // *******************************SKEW-CORRECTION*******************************
         // Skew skew = new Skew();
         // skew.printImg();

@@ -8,7 +8,7 @@ public class BinarizationTest {
     public void test(String imgName) {
         // String imagepath = "save-an.jpg";
         String imagepath = imgName;
-        String savepath = "save-n.png";
+        // String savepath = "save-n.png";
         // String imagepath = args[0];
         JFrame window = new JFrame();
         ImagePanel myimgpanel = new ImagePanel();

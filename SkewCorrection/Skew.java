@@ -1,4 +1,4 @@
-package Skew;
+package SkewCorrection;
 
 public class Skew {
 

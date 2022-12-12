@@ -1,20 +1,9 @@
-/**
- * Class for segmentation using connected component analysis
- *
- * @author Ravi Pandey
- * @version v1
- */
-
-package Segmentation;
+package SEG;
 
 import javax.swing.*;
 
 import Binarization.Image;
 import Binarization.ImagePanel;
-
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 
 public class Segmentation {
 
@@ -28,10 +17,6 @@ public class Segmentation {
     private int componentSequence[];
     private int componentRoot[];
     private int componentTrailer[];
-    private ArrayList<ArrayList<Integer>> componentSiblings = new ArrayList<ArrayList<Integer>>();
-
-    private BufferedImage bimg;
-    // private Component listedComp[] = new Component[MAX_COMP];
 
     /**
      * Constructor for objects of class Segmentation
@@ -159,17 +144,17 @@ public class Segmentation {
                 }
             }
         }
-        for (int i = 2; i < componentIndex; i++) {
-            System.out.println(componentSequence[i]);
-        }
-        System.out.println("Roots:");
-        for (int i = 2; i < componentIndex; i++) {
-            System.out.println(componentRoot[i]);
-        }
-        System.out.println("Trailer Array");
-        for (int i = 2; i < componentIndex; i++) {
-            System.out.println(componentTrailer[i]);
-        }
+        // for (int i = 2; i < componentIndex; i++) {
+        // System.out.println(componentSequence[i]);
+        // }
+        // System.out.println("Roots:");
+        // for (int i = 2; i < componentIndex; i++) {
+        // System.out.println(componentRoot[i]);
+        // }
+        // System.out.println("Trailer Array");
+        // for (int i = 2; i < componentIndex; i++) {
+        // System.out.println(componentTrailer[i]);
+        // }
         return componentIndex;
     }
 
@@ -199,12 +184,12 @@ public class Segmentation {
 
                         // setValues compares and sets diagonal co-ordinate values for component
                         // rectangle
-                        listedComp[image[i][j]].setValues(j, i);
+                        listedComp[image[i][j]].setValues(i, j);
                     }
                     // For parts of components already initiallized, setValues is only called
                     else {
 
-                        listedComp[image[i][j]].setValues(j, i);
+                        listedComp[image[i][j]].setValues(i, j);
                     }
 
                 }
@@ -230,12 +215,30 @@ public class Segmentation {
         img.pixel = image;
         JFrame window = new JFrame();
         // printImg();
-        imgP.setImgComp(img);
+        imgP.setBuffBounding(img, listedComp);
 
         window.getContentPane().add(imgP);
 
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setSize(600, 600);
         window.setVisible(true);
+
+    }
+
+    public void drawRectangles() {
+        // ImagePanel imgP = new ImagePanel();
+
+        // Image imgRect = new Image(IMG_X, IMG_Y);
+
+        // imgP.setBuffBounding(imgRect, listedComp);
+        // for (int i = 0; i < listedComp.length - 1; i++) {
+        // if (listedComp[i] != null) {
+
+        // for (int j = listedComp[i].getMinX(); j < listedComp[i].getMaxX(); j++) {
+        // imgRect.pixel[j][listedComp[i].getMinY()] = -1;
+        // imgRect.pixel[j][listedComp[i].getMaxY()] = -1;
+        // }
+        // }
+        // }
     }
 }

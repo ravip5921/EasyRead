@@ -1,11 +1,11 @@
+package SEG;
+
 /**
  * Write a description of class Component here.
  *
  * @author (your name)
  * @version (a version number or a date)
  */
-
-package Segmentation;
 
 public class Component {
     private int MAX_COMP = 99999;
