@@ -27,34 +27,12 @@ public class Segmentation {
 
         image = new int[IMG_X][IMG_Y];
         listedComp = new Component[MAX_COMP];
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
+        for (int i = 0; i < IMG_X; i++) {
+            for (int j = 0; j < IMG_Y; j++) {
                 image[i][j] = 0;
 
             }
         }
-        image[0][0] = 1;
-        image[1][0] = 1;
-        image[2][0] = 1;
-        image[2][1] = 1;
-        image[2][2] = 1;
-        image[2][3] = 1;
-        image[3][0] = 1;
-        image[4][0] = 1;
-        image[6][0] = 1;
-        image[7][0] = 1;
-        image[5][3] = 1;
-        image[5][4] = 1;
-        image[8][6] = 1;
-        image[9][6] = 1;
-        image[8][5] = 1;
-        image[9][5] = 1;
-        image[6][6] = 1;
-        image[7][6] = 1;
-        image[9][7] = 1;
-        image[9][8] = 1;
-        image[9][9] = 1;
-        image[8][9] = 1;
         for (int i = 0; i < 3; i++) {
             for (int j = 4; j < 7; j++) {
                 image[i][j] = 1;
@@ -84,15 +62,6 @@ public class Segmentation {
         }
     }
 
-    public int getRoot(int x) {
-        int temp = x;
-        while (componentSequence[temp] != temp) {
-            // System.out.println(temp + "ds" + componentSequence[temp]);
-            temp = componentSequence[temp];
-        }
-        return temp;
-    }
-
     public int labelComponents() {
         int componentIndex = 2;
         // boolean neighbourFound;
@@ -108,13 +77,13 @@ public class Segmentation {
 
                         // Checking left neighbour for SIBLINGS
                         if (((i > 0 && image[i - 1][j] != 0)) && image[i][j] != image[i - 1][j]) {
-                            int rootX = getRoot(image[i][j]);
-                            int rootY = getRoot(image[i - 1][j]);
+
+                            int rootX = componentRoot[image[i][j]];
+                            int rootY = componentRoot[image[i - 1][j]];
                             if (rootX == rootY) {
                                 continue;
                             }
                             componentSequence[rootY] = componentTrailer[rootX];
-
                             componentTrailer[rootX] = componentTrailer[rootY];
 
                             int temp1 = componentTrailer[rootY];
@@ -122,9 +91,7 @@ public class Segmentation {
                             while (temp1 != componentSequence[rootY]) {
                                 // System.out.println("Root changed.");
                                 componentRoot[temp1] = rootX;
-
                                 temp1 = componentSequence[temp1];
-
                             }
                         }
                     }
@@ -160,15 +127,6 @@ public class Segmentation {
         return componentIndex;
     }
 
-    public void mergeSiblings(int componentIndex) {
-        for (int i = 2; i < componentIndex; i++) {
-            listedComp[componentRoot[i]].mergeComp(listedComp[i]);
-            if (componentRoot[i] != i) {
-                listedComp[i] = null;
-            }
-        }
-    }
-
     public void prepareComponentList() {
         for (int i = 0; i < IMG_X; i++) {
             for (int j = 0; j < IMG_Y; j++) {
@@ -197,7 +155,15 @@ public class Segmentation {
                 }
             }
         }
+    }
 
+    public void mergeSiblings(int componentIndex) {
+        for (int i = 2; i < componentIndex; i++) {
+            listedComp[componentRoot[i]].mergeComp(listedComp[i]);
+            if (componentRoot[i] != i) {
+                listedComp[i] = null;
+            }
+        }
     }
 
     public void getRectangles() {
@@ -211,7 +177,7 @@ public class Segmentation {
         System.out.println("components = " + count);
     }
 
-    public void colorComponents() {
+    public void drawRectangles() {
         ImagePanel imgP = new ImagePanel();
         Image img = new Image(IMG_X, IMG_Y);
         img.pixel = binarizedImage;
@@ -222,25 +188,8 @@ public class Segmentation {
         window.getContentPane().add(imgP);
 
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setSize(600, 600);
+        window.setSize(IMG_X + 50, IMG_Y + 50);
         window.setVisible(true);
 
-    }
-
-    public void drawRectangles() {
-        // ImagePanel imgP = new ImagePanel();
-
-        // Image imgRect = new Image(IMG_X, IMG_Y);
-
-        // imgP.setBuffBounding(imgRect, listedComp);
-        // for (int i = 0; i < listedComp.length - 1; i++) {
-        // if (listedComp[i] != null) {
-
-        // for (int j = listedComp[i].getMinX(); j < listedComp[i].getMaxX(); j++) {
-        // imgRect.pixel[j][listedComp[i].getMinY()] = -1;
-        // imgRect.pixel[j][listedComp[i].getMaxY()] = -1;
-        // }
-        // }
-        // }
     }
 }

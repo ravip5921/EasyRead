@@ -6,7 +6,7 @@ public class OcrSystem {
         // ********************************BINARIZATION********************************
 
         BinarizationTest bint1 = new BinarizationTest();
-        bint1.test("a (3).png");
+        bint1.test("a.png");
 
         // ********************************SEGMENTATION********************************
 
@@ -19,11 +19,10 @@ public class OcrSystem {
         seg.prepareComponentList();
         seg.mergeSiblings(index);
         // seg.getRectangles();
-        seg.colorComponents();
+        seg.drawRectangles();
         // *******************************SKEW-CORRECTION*******************************
         // Skew skew = new Skew();
         // skew.printImg();
         // skew.getSkewAngle();
-
     }
 }
