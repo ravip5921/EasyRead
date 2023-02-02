@@ -49,7 +49,7 @@ public class BinarizeForServer {
         // segmentation.drawRectangles(segmentation.getComponents());
         segmentation.saveComponentImage(segmentation.getComponents(), savepath1 + "_rec_" + ".png");
         // System.out.print("");
-        segmentation.printImg();
+        //segmentation.printImg();
         System.out.println("Segementation  done");
 
         // ########################## SCORE NOISE ###################
